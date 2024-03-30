@@ -17,9 +17,17 @@ const tech = io.of('/tech');
 
 tech.on('connection', (socket) => {
     console.log('user connected');
-    socket.on('msg', (msg) => {
-        console.log(`message: ${msg}`);
-        tech.emit('msg', msg);
+    socket.on('msg', (data) => {
+        console.log(`message: ${data.room}`);
+        tech.emit('msg', data.msg);
+    });
+
+    socket.on('join', (data) => {
+        console.log(`request to join: ${data.room}`);
+        socket.join(data.room);
+        console.log(`joined: ${data.room}`);
+        tech.in(data.room).emit("msg", `New User joined room ${data.room}`);
+        tech.to(data.room).emit("msg", `New User joined room ${data.room}`);
     });
 
     socket.on('disconnect', () => {
